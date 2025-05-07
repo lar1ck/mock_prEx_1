@@ -138,20 +138,27 @@ const MarkManager = () => {
             </form>
 
             <div className="space-y-2">
-                {marks.map((m) => (
-                    <div key={m.Mark_Id} className="border p-2 rounded flex justify-between items-center">
-                        <div>
-                            <p><strong>Trainee ID:</strong> {m.Trainee_Id}</p>
-                            <p><strong>Module:</strong> {modules.find(module => module.Module_Id === m.Module_Id)?.ModName || 'Unknown'}</p>
-                            <p className="text-sm text-gray-600">Formative: {m.Formative_Ass} | Summative: {m.Summative_Ass} | Comprehensive: {m.Comprehensive_Ass}</p>
-                            <p><strong>Total:</strong> {m.Total_Marks_100}</p>
+            {marks.map((m) => {
+                    const trainee = trainees.find(t => t.Trainees_Id === m.Trainee_Id);
+                    const module = modules.find(mod => mod.Module_Id === m.Module_Id);
+                    
+                    return (
+                        <div key={m.Mark_Id} className="border p-2 rounded flex justify-between items-center">
+                            <div>
+                                <p><strong>Trainee:</strong> {trainee ? `${trainee.FirstNames} ${trainee.LastName}` : 'Unknown'}</p>
+                                <p><strong>Module:</strong> {module?.ModName || 'Unknown'}</p>
+                                <p className="text-sm text-gray-600">
+                                    Formative: {m.Formative_Ass} | Summative: {m.Summative_Ass} | Comprehensive: {m.Comprehensive_Ass}
+                                </p>
+                                <p><strong>Total:</strong> {m.Total_Marks_100}</p>
+                            </div>
+                            <div className="space-x-2">
+                                <button onClick={() => handleEdit(m)} className="bg-yellow-500 text-white px-2 py-1 rounded">Edit</button>
+                                <button onClick={() => handleDelete(m.Mark_Id)} className="bg-red-600 text-white px-2 py-1 rounded">Delete</button>
+                            </div>
                         </div>
-                        <div className="space-x-2">
-                            <button onClick={() => handleEdit(m)} className="bg-yellow-500 text-white px-2 py-1 rounded">Edit</button>
-                            <button onClick={() => handleDelete(m.Mark_Id)} className="bg-red-600 text-white px-2 py-1 rounded">Delete</button>
-                        </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         </div>
     );

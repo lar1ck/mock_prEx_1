@@ -40,17 +40,39 @@ const TraineeManager = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
-        if (editingId) {
-            await axios.put(`http://localhost:4500/api/trainees/${editingId}`, form);
-        } else {
-            await axios.post('http://localhost:4500/api/trainees', form);
+      
+        const normalizedFirstName = form.FirstNames.toLowerCase().trim();
+        const normalizedLastName = form.LastName.toLowerCase().trim();
+        const normalizedGender = form.Gender.toLowerCase().trim();
+        const tradeId = form.Trade_Id;
+      
+        const isExactDuplicate = trainees.some(t =>
+          t.FirstNames.toLowerCase().trim() === normalizedFirstName &&
+          t.LastName.toLowerCase().trim() === normalizedLastName &&
+          t.Gender.toLowerCase().trim() === normalizedGender &&
+          t.Trade_Id === tradeId
+        );
+      
+        if (!editingId && isExactDuplicate) {
+          alert('This exact trainee already exists.');
+          return;
         }
-
-        setForm({ FirstNames: '', LastName: '', Gender: '', Trade_Id: 0 });
-        setEditingId(null);
-        fetchTrainees();
-    };
+      
+        try {
+          if (editingId) {
+            await axios.put(`http://localhost:4500/api/trainees/${editingId}`, form);
+          } else {
+            await axios.post('http://localhost:4500/api/trainees', form);
+          }
+      
+          setForm({ FirstNames: '', LastName: '', Gender: '', Trade_Id: 0 });
+          setEditingId(null);
+          fetchTrainees();
+        } catch (error) {
+          console.error('Error saving trainee:', error);
+          alert('Error saving trainee. Please try again.');
+        }
+      };
 
     const handleEdit = (t: TraineeProps) => {
         setForm({

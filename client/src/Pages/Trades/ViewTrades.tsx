@@ -18,11 +18,26 @@ const TradeManager = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+  
+    // Normalize the name for comparison (optional)
+    const normalizedName = tradeName.trim().toLowerCase();
+  
+    // Uniqueness check (only for adding new trades)
+    const isDuplicate = trades.some(
+      (trade) => trade.Trade_Name.trim().toLowerCase() === normalizedName
+    );
+  
+    if (!editingId && isDuplicate) {
+      alert('Trade already exists!');
+      return;
+    }
+  
     if (editingId) {
       await axios.put(`http://localhost:4500/api/trades/${editingId}`, { Trade_Name: tradeName });
     } else {
       await axios.post('http://localhost:4500/api/trades', { Trade_Name: tradeName });
     }
+  
     setTradeName('');
     setEditingId(null);
     fetchTrades();

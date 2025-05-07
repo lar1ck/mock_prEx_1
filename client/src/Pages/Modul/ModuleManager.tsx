@@ -5,7 +5,7 @@ import type ModuleProps from '../../types/types';
 const ModuleManager = () => {
   const [modules, setModules] = useState<ModuleProps[]>([]);
   const [modName, setModName] = useState('');
-  const [modCredits, setModCredits] = useState<number>(0);
+  const [modCredits, setModCredits] = useState<number>();
   const [editingId, setEditingId] = useState<number | null>(null);
 
   const fetchModules = async () => {
@@ -19,23 +19,34 @@ const ModuleManager = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+  
+    const normalizedName = modName.trim().toLowerCase();
+  
+    const isDuplicate = modules.some(
+      (mod) => mod.ModName.trim().toLowerCase() === normalizedName
+    );
+  
+    if (!editingId && isDuplicate) {
+      alert('Module already exists!');
+      return;
+    }
+  
     const payload = {
       ModName: modName,
       ModCredits: modCredits,
     };
-
+  
     if (editingId) {
       await axios.put(`http://localhost:4500/api/modules/${editingId}`, payload);
     } else {
       await axios.post('http://localhost:4500/api/modules', payload);
     }
-
+  
     setModName('');
     setModCredits(0);
     setEditingId(null);
     fetchModules();
   };
-
   const handleEdit = (mod: ModuleProps) => {
     setModName(mod.ModName);
     setModCredits(mod.ModCredits);
